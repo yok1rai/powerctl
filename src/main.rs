@@ -24,12 +24,12 @@ pub enum Options {
 impl Options {
     fn new(ent: String) -> Result<Options, &'static str> {
         match ent.trim().to_lowercase().as_str() {
-            "--shutdown" | "-sd" => return Ok(Options::Shutdown),
-            "--reboot" | "-r" => return Ok(Options::Reboot),
-            "--sleep" | "-sl" => return Ok(Options::Sleep),
-            "--help" | "-h" => return Ok(Options::Help),
-            _ => return Err("Invalid argument (enter --help or -h        to read the handbook)")
-        };
+            "--shutdown" | "-sd" => Ok(Options::Shutdown),
+            "--reboot" | "-r" => Ok(Options::Reboot),
+            "--sleep" | "-sl" => Ok(Options::Sleep),
+            "--help" | "-h" => Ok(Options::Help),
+            _ => Err("Invalid argument (enter --help or -h to read the handbook)")
+        }
     }
     fn execute(&self) -> Result<(), &'static str> {
         let cmd = match self {
@@ -42,7 +42,7 @@ impl Options {
                 println!("{:<12} {:<6} {}", "--shutdown", "-sd", "Shut down the computer");
                 println!("{:<12} {:<6} {}", "--reboot", "-r", "Reboot the computer");
                 println!("{:<12} {:<6} {}", "--sleep", "-sl", "Put the computer to sleep");
-                println!("{:<12} {:<6} {}", "--help", "h", "read the powerctl handbook");
+                println!("{:<12} {:<6} {}", "--help", "-h", "read the powerctl handbook");
                 return Ok(());
             }
         };
@@ -96,14 +96,13 @@ fn main() {
                                     process::exit(4)
                                 }
                             };
-                            break; 
+                            break;
                         } else {
                             eprintln!("Invalid option");
                         }
                     }
                 } else {
-                    #[allow(unused_must_use)]
-                    opt.execute();
+                    let _ = opt.execute();
                 }
             }
         },
