@@ -21,6 +21,19 @@ pub enum Options {
     Help,
 }
 
+fn check_systemd() -> bool {
+    match Command::new("ps")
+        .args(["-p","1","-o", "comm="])
+        .output()
+     {
+        Ok(output) => {
+            let name = String::from_utf8_lossy(&output.stdout);
+            name.trim() == "systemd"
+        }
+        Err(_) => false,
+    }
+}
+
 impl Options {
     fn new(ent: String) -> Result<Options, &'static str> {
         match ent.trim().to_lowercase().as_str() {
@@ -64,6 +77,10 @@ fn parse(args: Vec<String>) -> Result<String, &'static str> {
 }
 
 fn main() {
+    if check_systemd() == false {
+        eprintln!("only systemd is supported");
+        process::exit(15);
+    }
     let args = env::args().collect();
     match parse(args) {
         Ok(opt) => {
